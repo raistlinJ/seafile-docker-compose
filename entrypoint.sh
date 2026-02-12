@@ -26,20 +26,25 @@ DEST_DIR="/shared/seafile/seafile-server-latest/seahub"
             
             # CSRF / URL Fix
             CONFIG_FILE="/shared/seafile/conf/seahub_settings.py"
+            HOSTNAME="${SEAFILE_SERVER_HOSTNAME:-localhost}"
+            
+            # Check if seahub_settings.py exists
             if [ -f "$CONFIG_FILE" ]; then
-                if ! grep -q "CSRF_TRUSTED_ORIGINS" "$CONFIG_FILE"; then
-                    echo "Injecting CSRF settings into seahub_settings.py..."
-                    echo "" >> "$CONFIG_FILE"
-                    
-                    # Use provided hostname or default to localhost
-                    HOSTNAME="${SEAFILE_SERVER_HOSTNAME:-localhost}"
-                    
-                    echo "CSRF_TRUSTED_ORIGINS = [\"https://${HOSTNAME}\", \"https://${HOSTNAME}:8443\", \"https://localhost\", \"https://127.0.0.1\", \"https://localhost:8443\"]" >> "$CONFIG_FILE"
-                    echo "SERVICE_URL = \"https://${HOSTNAME}\"" >> "$CONFIG_FILE"
-                    echo "FILE_SERVER_ROOT = \"https://${HOSTNAME}/seafhttp\"" >> "$CONFIG_FILE"
-                    
-                    echo "Settings injected for ${HOSTNAME}. Please restart container if changes don't take effect immediately."
-                    # Do not restart proactively to avoid race conditions with startup script
+                # Check if the specific hostname is already trusted (or at least mentioned in the config)
+                # We grep for the hostname in the file. If not found, we append our config.
+                # Appending to the end of a python file overrides previous variable definitions.
+                 if ! grep -q "https://${HOSTNAME}" "$CONFIG_FILE"; then
+                    echo "Injecting CSRF settings for ${HOSTNAME} into seahub_settings.py..."
+                    {
+                        echo ""
+                        echo "# Added by entrypoint.sh - Overriding/Adding CSRF settings"
+                        echo "CSRF_TRUSTED_ORIGINS = [\"https://${HOSTNAME}\", \"https://${HOSTNAME}:8443\", \"https://localhost\", \"https://127.0.0.1\", \"https://127.0.0.1:8443\"]"
+                        echo "SERVICE_URL = \"https://${HOSTNAME}\""
+                        echo "FILE_SERVER_ROOT = \"https://${HOSTNAME}/seafhttp\""
+                    } >> "$CONFIG_FILE"
+                    echo "Settings injected for ${HOSTNAME}. Please restart container."
+                else
+                    echo "Hostname ${HOSTNAME} already found in seahub_settings.py. Skipping injection."
                 fi
             fi
             break
