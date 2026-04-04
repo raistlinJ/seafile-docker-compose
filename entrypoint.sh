@@ -26,7 +26,11 @@ DEST_DIR="/shared/seafile/seafile-server-latest/seahub"
             
             # CSRF / URL Fix
             CONFIG_FILE="/shared/seafile/conf/seahub_settings.py"
-            HOSTNAME="${SEAFILE_SERVER_HOSTNAME:-localhost}"
+            RAW_HOSTNAME="${SEAFILE_SERVER_HOSTNAME:-localhost}"
+            HOSTNAME="${RAW_HOSTNAME#http://}"
+            HOSTNAME="${HOSTNAME#https://}"
+            HOSTNAME="${HOSTNAME%%/*}"
+            HOSTNAME="${HOSTNAME%%:*}"
             
             # Check if seahub_settings.py exists
             if [ -f "$CONFIG_FILE" ]; then
@@ -38,7 +42,7 @@ DEST_DIR="/shared/seafile/seafile-server-latest/seahub"
                     {
                         echo ""
                         echo "# Added by entrypoint.sh - Overriding/Adding CSRF settings"
-                        echo "CSRF_TRUSTED_ORIGINS = [\"https://${HOSTNAME}\", \"https://${HOSTNAME}:8443\", \"https://localhost\", \"https://127.0.0.1\", \"https://127.0.0.1:8443\"]"
+                        echo "CSRF_TRUSTED_ORIGINS = [\"https://${HOSTNAME}\", \"https://localhost\", \"https://127.0.0.1\"]"
                         echo "SERVICE_URL = \"https://${HOSTNAME}\""
                         echo "FILE_SERVER_ROOT = \"https://${HOSTNAME}/seafhttp\""
                     } >> "$CONFIG_FILE"

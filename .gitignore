@@ -1,1 +1,4 @@
 /ssl
+.env
+.env.local
+.env.*.local

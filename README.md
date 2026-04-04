@@ -1,9 +1,9 @@
 # Seafile Docker with HTTPS (Self-Signed)
 
-This repository contains a complete Docker Compose setup for Seafile, pre-configured with:
-- **HTTPS Trust**: Automated certificate generation and CSRF configuration.
-- **Static Assets Fix**: Automated startup script to ensure CSS/JS load correctly on Linux/Ubuntu.
-- **Nginx Proxy**: Handles SSL termination.
+This repository contains a Docker Compose setup for Seafile with:
+- **HTTPS on ports 80/443**: Nginx redirects HTTP to HTTPS and terminates TLS.
+- **Host-aware self-signed certificates**: The helper script generates a certificate for your configured hostname or IP.
+- **Static assets fix**: Startup script to ensure CSS/JS load correctly on Linux/Ubuntu.
 
 ## Prerequisites
 - Docker and Docker Compose installed.
@@ -13,15 +13,21 @@ This repository contains a complete Docker Compose setup for Seafile, pre-config
 ### 1. Clone and Configure
 Copy `.env.example` to `.env` (if not already present) and update the following variables:
 
-- **`SEAFILE_SERVER_HOSTNAME`**: Set this to your server's IP address (e.g., `192.168.1.50`) or domain name. **Crucial for trusted access.**
+- **`SEAFILE_SERVER_HOSTNAME`**: Set this to the hostname or IP you will use in the browser, without `http://` or `https://`. Example: `acostanet.ddns.net`.
 - **`SEAFILE_ADMIN_PASSWORD`**: Change to a strong password.
-- **`DB_ROOT_PASSWORD`** & **`DB_PASSWORD`**: Change these database, passwords.
+- **`DB_ROOT_PASSWORD`**: Change this database password.
 
 ### 2. Generate SSL Certificates
-Run the helper script to generate self-signed certificates:
+Run the helper script after setting `SEAFILE_SERVER_HOSTNAME`:
 ```bash
+cp .env.example .env
 chmod +x generate_certs.sh
 ./generate_certs.sh
+```
+
+If you prefer, you can pass the hostname or IP explicitly:
+```bash
+./generate_certs.sh 192.168.1.50
 ```
 
 ### 3. Start the Server
@@ -34,6 +40,8 @@ Wait about 1-2 minutes for the initial setup to complete.
 Go to `https://<YOUR_IP_OR_DOMAIN>`.
 - Accept the self-signed certificate warning.
 - Login with the admin email and password from your `.env` file.
+
+Nginx now owns host ports `80` and `443`. The Seafile container is only reachable on the internal Docker network.
 
 ## Troubleshooting
 

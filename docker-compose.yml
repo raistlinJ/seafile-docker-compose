@@ -22,9 +22,9 @@ services:
   seafile:
     image: seafileltd/seafile-mc:latest
     container_name: seafile
-    ports:
-      - "80:80"
-#     - "443:443"  # If https is enabled, cancel the comment.
+    expose:
+      - "80"
+      - "8082"
     volumes:
       - ./seafile-data:/shared   # Requested, specifies the path to Seafile data persistent store.
       - ./entrypoint.sh:/etc/my_init.d/99_fix_static_assets.sh:ro
@@ -35,7 +35,7 @@ services:
       - SEAFILE_ADMIN_EMAIL=${SEAFILE_ADMIN_EMAIL} # Specifies Seafile admin user, default is 'me@example.com'.
       - SEAFILE_ADMIN_PASSWORD=${SEAFILE_ADMIN_PASSWORD} # Specifies Seafile admin password, default is 'asecret'.
       - SEAFILE_SERVER_LETSENCRYPT=false   # Whether to use https or not.
-      - SEAFILE_SERVER_HOSTNAME=${SEAFILE_SERVER_HOSTNAME} # Specifies your host name if https is enabled.
+      - SEAFILE_SERVER_HOSTNAME=${SEAFILE_SERVER_HOSTNAME} # Hostname only, without http:// or https://.
     depends_on:
       - db
       - memcached
@@ -46,7 +46,7 @@ services:
     image: nginx:latest
     container_name: seafile-nginx
     ports:
-      - "8080:80"
+      - "80:80"
       - "443:443"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
