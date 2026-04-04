@@ -1,0 +1,30 @@
+{$SEAFILE_SERVER_HOSTNAME} {
+	tls /etc/caddy/certs/server.crt /etc/caddy/certs/server.key
+
+	encode zstd gzip
+
+	handle_path /media* {
+		root * /srv/media
+		file_server
+	}
+
+	handle_path /seafhttp* {
+		reverse_proxy seafile:8082 {
+			header_up Host {host}
+			header_up X-Forwarded-Proto https
+
+			transport http {
+				read_timeout 36000s
+				write_timeout 36000s
+			}
+		}
+	}
+
+	handle {
+		reverse_proxy seafile:80 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-Proto https
+		}
+	}
+}

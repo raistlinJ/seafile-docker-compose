@@ -24,7 +24,11 @@ echo "Copying static media files from container to host..."
 # Use tar pipe to preserve symlinks and permissions
 docker exec seafile tar -cf - -C /opt/seafile/seafile-server-latest/seahub media | tar -xf - -C "$DEST_DIR"
 
-echo "Restarting Nginx to pickup changes..."
-docker-compose restart nginx
+if docker ps --format '{{.Names}}' | grep -qx seafile-caddy; then
+    echo "Restarting Caddy to pick up changes..."
+    docker restart seafile-caddy
+else
+    echo "Caddy container is not running. Static assets were copied, but no proxy was restarted."
+fi
 
 echo "Success! Static assets restored."

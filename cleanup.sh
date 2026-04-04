@@ -8,7 +8,7 @@ then
 fi
 
 echo "Stopping containers..."
-docker-compose down
+docker compose down --remove-orphans -v
 
 echo "Removing data directories..."
 rm -rf mysql-data
