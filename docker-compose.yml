@@ -44,6 +44,8 @@ services:
   caddy:
     image: caddy:2
     container_name: seafile-caddy
+    environment:
+      - SEAFILE_SERVER_HOSTNAME=${SEAFILE_SERVER_HOSTNAME}
     ports:
       - "80:80"
       - "443:443"
