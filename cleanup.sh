@@ -13,6 +13,8 @@ docker compose down --remove-orphans -v
 echo "Removing data directories..."
 rm -rf mysql-data
 rm -rf seafile-data
+rm -rf caddy-data
+rm -rf caddy-config
 
 # Optional: Remove ssl certs if you want a complete fresh start
 # rm -rf ssl

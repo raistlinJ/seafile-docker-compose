@@ -54,8 +54,8 @@ services:
       - ./caddy/Caddyfile.selfsigned:/etc/caddy/Caddyfile.selfsigned:ro
       - ./ssl:/etc/caddy/certs:ro
       - ./seafile-data/seafile/seafile-server-latest/seahub/media:/srv/media:ro
-      - caddy-data:/data
-      - caddy-config:/config
+      - ./caddy-data:/data
+      - ./caddy-config:/config
     depends_on:
       - seafile
     networks:
@@ -63,7 +63,3 @@ services:
 
 networks:
   seafile-net:
-
-volumes:
-  caddy-data:
-  caddy-config:

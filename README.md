@@ -47,6 +47,8 @@ Go to `https://<YOUR_IP_OR_DOMAIN>`.
 
 Caddy owns host ports `80` and `443`. The Seafile container is only reachable on the internal Docker network.
 
+Let's Encrypt state is stored on the host under `./caddy-data`, and Caddy runtime config is stored under `./caddy-config`.
+
 ## Mode Selection
 
 - **Let's Encrypt**: `docker compose up -d`
@@ -64,6 +66,8 @@ Inspect the proxy logs with:
 ```bash
 docker logs -f seafile-caddy
 ```
+
+If you need to inspect the issued certificates on disk, look under `caddy-data/caddy/certificates/` on the host.
 
 ### "Forbidden (403) CSRF verification failed"
 If you changed your hostname/IP *after* the first run:

@@ -1,4 +1,6 @@
 /ssl
+/caddy-data
+/caddy-config
 .env
 .env.local
 .env.*.local
